@@ -147,16 +147,19 @@ class Avl_tree:
         if curr.parent==None:
             return
         path=[curr]+path
-        lh=self.get_height(curr.left)
-        rh=self.get_height(curr.right)
+        lh=self.get_height(curr.parent.left)
+        rh=self.get_height(curr.parent.right)
         if abs(lh-rh)>1:
             path=[curr.parent]+path
+
             self.rebalance(path[0],path[1],path[2])
+            self.upd(curr)
             return
         newh=1+curr.height
         if newh>curr.parent.height:
             curr.parent.height=newh
         self._inspect_insertion(curr.parent,path)
+        self.upd(curr.parent)
 
     def _inspect_del(self,curr):
         if curr==None:
@@ -172,7 +175,7 @@ class Avl_tree:
 
     def rebalance(self,z,y,x):
 
-        if x==z.left and x==y.left:
+        if y==z.left and x==y.left:
             self.right_rotate(z)
 
         elif y==z.left and x==y.right:
@@ -185,10 +188,10 @@ class Avl_tree:
         elif y==z.right and x==y.left:
             self.right_rotate(y)
             self.left_rotate(z)
-
         return
 
     def right_rotate(self,z):
+
         sub=z.parent
         y=z.left
         t=y.right
@@ -206,7 +209,7 @@ class Avl_tree:
             else:
                 y.parent.right=y
         z.height=1+max(self.get_height(z.left),self.get_height(z.right))
-        y.height=1+max(self.get_height(y.right),self.get_height(z.left))
+        y.height=1+max(self.get_height(y.right),self.get_height(y.left))
 
     def left_rotate(self,z):
         sub = z.parent
@@ -226,7 +229,7 @@ class Avl_tree:
             else:
                 y.parent.right = y
         z.height = 1 + max(self.get_height(z.left), self.get_height(z.right))
-        y.height = 1 + max(self.get_height(y.right), self.get_height(z.left))
+        y.height = 1 + max(self.get_height(y.right), self.get_height(y.left))
 
     def get_height(self,curr):
         if curr==None:
@@ -240,11 +243,27 @@ class Avl_tree:
         return curr.right
 
     def upd(self,curr):
+        if curr.left!=None:
+            self.__upd(curr.left)
+        else:
+            curr.ln=0
+        if curr.right!=None:
+            self.__upd(curr.right)
+        else:
+            curr.rn=0
+        self.__upd(curr)
 
+    def __upd(self,curr):
         while curr!=None:
             if curr.left!=None:
-                curr.ln=curr.left.ln+1
+                curr.ln=curr.left.ln+curr.left.rn+1
+            else:
+                curr.rn=0
             if curr.right!=None:
-                curr.rn=curr.right.rn+1
+                curr.rn=curr.right.rn+curr.right.ln+1
+            else:
+                curr.rn=0
             curr=curr.parent
+
+
 
