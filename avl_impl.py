@@ -8,7 +8,7 @@ class Node:
         self.right=None
         self.ln=0
         self.rn=0
-        self.height=0
+        self.height=1
         self.parent=None
 
 
